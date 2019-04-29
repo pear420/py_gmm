@@ -1,0 +1,9 @@
+README.md
+setup.py
+py_gmm/__init__.py
+py_gmm/mat.py
+py_gmm.egg-info/PKG-INFO
+py_gmm.egg-info/SOURCES.txt
+py_gmm.egg-info/dependency_links.txt
+py_gmm.egg-info/not-zip-safe
+py_gmm.egg-info/top_level.txt

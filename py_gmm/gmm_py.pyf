@@ -1,0 +1,148 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module gmm_py ! in 
+    interface  ! in :gmm_py
+        module local_kinds ! in :gmm_py:gmm_f2py_module.f90
+            integer, parameter,optional :: sgl=selected_real_kind(p=6,r=37)
+            integer, parameter,optional :: dbl=selected_real_kind(p=15,r=307)
+            integer, parameter,optional :: vshort=selected_int_kind(2)
+            integer, parameter,optional :: short_bn=selected_int_kind(4)
+            integer, parameter,optional :: long_bn=selected_int_kind(9)
+            integer, parameter,optional :: lo=selected_int_kind(9)
+            integer, parameter,optional :: length=30
+            real(kind=4), parameter,optional :: pi=3.141592653589793
+            real(kind=4), parameter,optional :: pio2=1.5707963267948966
+            real(kind=4), parameter,optional :: twopi=6.283185307179586
+            real(kind=4), parameter,optional :: sqrt2=1.4142135623730951
+            real(kind=4), parameter,optional :: euler=0.5772156649015329
+            real(kind=8), parameter,optional :: pi_d=3.141592653589793
+            real(kind=8), parameter,optional :: pio2_d=1.5707963267948966
+            real(kind=8), parameter,optional :: twopi_d=6.283185307179586
+            real(kind=8), parameter,optional :: sqrt2_d=1.4142135623730951
+            real(kind=8), parameter,optional :: euler_d=0.5772156649015329
+            real(kind=8), parameter,optional :: e=1.6021765314e-19
+            real(kind=8), parameter,optional :: me=9.109382616e-31
+            real(kind=8), parameter,optional :: e0=8.854187817e-12
+            real(kind=8), parameter,optional :: c=299792458.0
+            real(kind=8), parameter,optional :: zerodbl=0.0d0
+        end module local_kinds
+        module gmm_f2py_module ! in :gmm_py:gmm_f2py_module.f90
+            use datatypes
+            use operators
+            use basicsubs
+            use gmmsubs
+            use sing_part
+            use vec_trans
+            use local_field
+            use shared_data
+            use linear_solver
+            subroutine emn(nstop,v_emn,error) ! in :gmm_py:gmm_f2py_module.f90:gmm_f2py_module
+                use local_kinds
+                integer(kind=4) intent(in) :: nstop
+                complex(kind=8) dimension(nstop*(nstop+2)),intent(out),depend(nstop) :: v_emn
+                integer(kind=4) intent(out) :: error
+            end subroutine emn
+            subroutine expansion_coefficients(ns,m_xyz_inp,v_r_inp,m_eps_inp,fint,ref_index,lambda_inp,alpha0,beta0,gamma0,nstop,quasi_static_flag,m_coeff,v_cext,v_csca,v_cabs) ! in :gmm_py:gmm_f2py_module.f90:gmm_f2py_module
+                use local_kinds
+                integer(kind=4), optional,intent(in),check(shape(m_xyz_inp,0)==ns),depend(m_xyz_inp) :: ns=shape(m_xyz_inp,0)
+                real(kind=8) dimension(ns,3),intent(in) :: m_xyz_inp
+                real(kind=8) dimension(ns),intent(in),depend(ns) :: v_r_inp
+                real(kind=8) dimension(ns,2),intent(in),depend(ns) :: m_eps_inp
+                real(kind=8) intent(in) :: fint
+                real(kind=8) intent(in) :: ref_index
+                real(kind=8) intent(inout) :: lambda_inp
+                real(kind=8) intent(inout) :: alpha0
+                real(kind=8) intent(inout) :: beta0
+                real(kind=8) intent(inout) :: gamma0
+                integer(kind=4) intent(in) :: nstop
+                character*3 intent(in) :: quasi_static_flag
+                complex(kind=8) dimension(2*nstop*(nstop+2)*ns,2),intent(out),depend(ns,nstop) :: m_coeff
+                real(kind=8) dimension(ns),intent(out),depend(ns) :: v_cext
+                real(kind=8) dimension(ns),intent(out),depend(ns) :: v_csca
+                real(kind=8) dimension(ns),intent(out),depend(ns) :: v_cabs
+            end subroutine expansion_coefficients
+            subroutine exyz(flaginc,ns,nstop,ratio,lambda_inp,alpha0,beta0,gamma0,x,y,z,v_amnbmn,v_dmncmn,v_emn,m_xyz_inp,m_eps_inp,v_r_inp,ref_index,quasi_static_flag,ex,ey,ez,eabs,error) ! in :gmm_py:gmm_f2py_module.f90:gmm_f2py_module
+                use local_kinds
+                character*3 intent(in) :: flaginc
+                integer(kind=4), optional,intent(in),check(shape(m_xyz_inp,0)==ns),depend(m_xyz_inp) :: ns=shape(m_xyz_inp,0)
+                integer(kind=4) intent(in) :: nstop
+                integer(kind=4) intent(in) :: ratio
+                real(kind=8) intent(inout) :: lambda_inp
+                real(kind=8) intent(in) :: alpha0
+                real(kind=8) intent(in) :: beta0
+                real(kind=8) intent(in) :: gamma0
+                real(kind=8) intent(in) :: x
+                real(kind=8) intent(in) :: y
+                real(kind=8) intent(in) :: z
+                complex(kind=8) dimension(2*nstop*(nstop+2)*ns),intent(in),depend(ns,nstop) :: v_amnbmn
+                complex(kind=8) dimension(2*nstop*(nstop+2)*ns),intent(in),depend(ns,nstop) :: v_dmncmn
+                complex(kind=8) dimension(nstop*(nstop+2)),intent(in),depend(nstop) :: v_emn
+                real(kind=8) dimension(ns,3),intent(in) :: m_xyz_inp
+                real(kind=8) dimension(ns,2),intent(in),depend(ns) :: m_eps_inp
+                real(kind=8) dimension(ns),intent(in),depend(ns) :: v_r_inp
+                real(kind=8) intent(in) :: ref_index
+                character*3 intent(in) :: quasi_static_flag
+                complex(kind=8) intent(out) :: ex
+                complex(kind=8) intent(out) :: ey
+                complex(kind=8) intent(out) :: ez
+                real(kind=8) intent(out) :: eabs
+                integer(kind=4) intent(out) :: error
+            end subroutine exyz
+            subroutine efar(k,ns,nstop,phimin,phimax,phistep,thetastep,betap,v_amnbmn,m_xyz_inp,m_sc,scatot,error) ! in :gmm_py:gmm_f2py_module.f90:gmm_f2py_module
+                use local_kinds
+                real(kind=8) intent(in) :: k
+                integer(kind=4), optional,intent(in),check(shape(m_xyz_inp,0)==ns),depend(m_xyz_inp) :: ns=shape(m_xyz_inp,0)
+                integer(kind=4) intent(in) :: nstop
+                real(kind=8) intent(in) :: phimin
+                real(kind=8) intent(in) :: phimax
+                integer(kind=4) intent(in) :: phistep
+                integer(kind=4) intent(in) :: thetastep
+                real(kind=8) intent(inout) :: betap
+                complex(kind=8) dimension(2*nstop*(nstop+2)*ns),intent(in),depend(ns,nstop) :: v_amnbmn
+                real(kind=8) dimension(ns,3),intent(in) :: m_xyz_inp
+                complex(kind=8) dimension(thetastep + 1,phistep + 1,7),intent(out),depend(thetastep,phistep) :: m_sc
+                real(kind=8) intent(out) :: scatot
+                integer(kind=4) intent(out) :: error
+            end subroutine efar
+            subroutine efar_poynting(k,ns,nstop,phimin,phimax,phistep,thetastep,betap,v_amnbmn,m_xyz_inp,m_sc,scatot,error) ! in :gmm_py:gmm_f2py_module.f90:gmm_f2py_module
+                use local_kinds
+                real(kind=8) intent(in) :: k
+                integer(kind=4), optional,intent(in),check(shape(m_xyz_inp,0)==ns),depend(m_xyz_inp) :: ns=shape(m_xyz_inp,0)
+                integer(kind=4) intent(in) :: nstop
+                real(kind=8) intent(in) :: phimin
+                real(kind=8) intent(in) :: phimax
+                integer(kind=4) intent(in) :: phistep
+                integer(kind=4) intent(in) :: thetastep
+                real(kind=8) intent(inout) :: betap
+                complex(kind=8) dimension(2*nstop*(nstop+2)*ns),intent(in),depend(ns,nstop) :: v_amnbmn
+                real(kind=8) dimension(ns,3),intent(in) :: m_xyz_inp
+                complex(kind=8) dimension(thetastep + 1,phistep + 1,7),intent(out),depend(thetastep,phistep) :: m_sc
+                real(kind=8) intent(out) :: scatot
+                integer(kind=4) intent(out) :: error
+            end subroutine efar_poynting
+            subroutine dip_coefficients(ns,ndip,m_xyz_inp,v_r_inp,m_eps_inp,fint,q0,ref_index,lambda_inp,alpha0,beta0,gamma0,nstop,quasi_static_flag,m_coeff,v_w) ! in :gmm_py:gmm_f2py_module.f90:gmm_f2py_module
+                use local_kinds
+                integer(kind=4), optional,intent(in),check(shape(m_xyz_inp,0)==ns),depend(m_xyz_inp) :: ns=shape(m_xyz_inp,0)
+                integer(kind=4) intent(in) :: ndip
+                real(kind=8) dimension(ns,3),intent(in) :: m_xyz_inp
+                real(kind=8) dimension(ns),intent(in),depend(ns) :: v_r_inp
+                real(kind=8) dimension(ns,2),intent(in),depend(ns) :: m_eps_inp
+                real(kind=8) intent(in) :: fint
+                real(kind=8) intent(in) :: q0
+                real(kind=8) intent(in) :: ref_index
+                real(kind=8) intent(inout) :: lambda_inp
+                real(kind=8) intent(inout) :: alpha0
+                real(kind=8) intent(inout) :: beta0
+                real(kind=8) intent(inout) :: gamma0
+                integer(kind=4) intent(in) :: nstop
+                character*3 intent(in) :: quasi_static_flag
+                complex(kind=8) dimension(2*nstop*(nstop+2)*ns,2),intent(out),depend(ns,nstop) :: m_coeff
+                real(kind=8) dimension(6),intent(out) :: v_w
+            end subroutine dip_coefficients
+        end module gmm_f2py_module
+    end interface 
+end python module gmm_py
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/
